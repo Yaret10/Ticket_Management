@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Contigo - Local" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.yaret.contigo.ContigoApplication" />
+    <module name="contigo" />
+    <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=local --spring.config.import=file:./.env[.properties]" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

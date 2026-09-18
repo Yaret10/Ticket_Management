@@ -1,0 +1,5 @@
+<!doctype html><html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${title} + ' · conTIgo'">conTIgo</title><link rel="stylesheet" href="/css/app.css"><script type="module" src="/js/app.js"></script></head>
+<body><header th:fragment="header"><a class="brand" href="/menu"><img src="/images/logo.png" alt="STROBBE"><span>con<span class="accent">TI</span>go</span></a><nav aria-label="Principal"><a href="/menu">Inicio</a><a href="/tickets/new" data-requester>Nuevo ticket</a><a href="/tickets">Tickets</a><a href="/dashboard">Dashboard</a><a href="/reports">Reportes</a><a href="/users/new" data-admin hidden>Usuarios</a></nav><div class="session"><span id="me-name"></span><button id="theme" type="button" aria-label="Cambiar tema">◐</button><button id="logout" type="button">Salir</button></div></header>
+<div th:fragment="messages" id="message" class="message" role="status" aria-live="polite" hidden></div>
+<footer th:fragment="footer">conTIgo · STROBBE — Soporte de tecnología</footer></body></html>

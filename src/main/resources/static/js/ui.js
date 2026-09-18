@@ -1,0 +1,4 @@
+export function message(text, error = false) {const node=document.querySelector('#message');node.textContent=text;node.hidden=false;node.classList.toggle('error',error);if(error) node.scrollIntoView({behavior:'smooth',block:'nearest'});}
+export function element(tag, text, className) {const node=document.createElement(tag);if(text!==undefined&&text!==null) node.textContent=String(text);if(className) node.className=className;return node;}
+export function date(value) {return value ? new Intl.DateTimeFormat('es-PE',{dateStyle:'short',timeStyle:'short',timeZone:'America/Lima'}).format(new Date(value)) : '—';}
+export async function busy(button, action, text='Procesando…') {const original=button.textContent;button.disabled=true;button.textContent=text;try {return await action();}catch(error){message(error.message,true);}finally {button.disabled=false;button.textContent=original;}}

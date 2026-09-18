@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-CU26-ubuntu-22.04
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Genere .env primero}
+      SQLCMDPASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-CU26-ubuntu-22.04
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SQLCMDPASSWORD: ${DB_PASSWORD}
+    entrypoint: ["/opt/mssql-tools18/bin/sqlcmd"]
+    command: ["-S", "db", "-U", "sa", "-C", "-b", "-Q", "IF DB_ID(N'contigo') IS NULL CREATE DATABASE contigo"]
+  app:
+    build: .
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:sqlserver://db:1433;databaseName=contigo;encrypt=true;trustServerCertificate=true
+      DB_USER: sa
+      DB_PASSWORD: ${DB_PASSWORD}
+      DEV_PASSWORD: ${DEV_PASSWORD}
+      DEV_SEED: ${DEV_SEED:-false}
+      JWT_PRIVATE_KEY: file:/run/keys/private.pem
+      JWT_PUBLIC_KEY: file:/run/keys/public.pem
+      ATTACHMENTS_ROOT: /app/evidence
+      MAIL_MODE: local
+    volumes:
+      - ./.local/private.pem:/run/keys/private.pem:ro
+      - ./.local/public.pem:/run/keys/public.pem:ro
+      - evidence:/app/evidence
+volumes:
+  sql-data:
+  evidence:
