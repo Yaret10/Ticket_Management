@@ -81,6 +81,13 @@ En Azure App Service, `JWT_PRIVATE_KEY` y `JWT_PUBLIC_KEY` pueden contener direc
 (con saltos de línea reales o escritos como `\\n`). La aplicación también conserva compatibilidad con
 rutas `file:` usadas por Docker y el entorno local. Después de cambiar estas variables, reinicia el App Service.
 
+### Despliegue en Azure App Service
+
+El workflow `.github/workflows/deploy-azure.yml` compila el proyecto y publica el JAR en `contigo-backend`.
+En GitHub crea el secreto `AZURE_WEBAPP_PUBLISH_PROFILE` con el perfil de publicación descargado desde
+**Azure App Service → Descargar perfil de publicación**. El App Service debe usar Java SE y tener como
+comando de inicio `java -jar /home/site/wwwroot/contigo-1.0.0-SNAPSHOT.jar --server.port=8080`.
+
 La API está disponible bajo `/api/v1`. Swagger UI se encuentra en `/swagger-ui/index.html` después de iniciar sesión.
 
 ## Documentación adicional
