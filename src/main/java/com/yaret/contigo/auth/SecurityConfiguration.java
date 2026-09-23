@@ -3,9 +3,13 @@ package com.yaret.contigo.auth;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import jakarta.servlet.http.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.converter.RsaKeyConverters;
@@ -30,15 +34,15 @@ public class SecurityConfiguration {
 
   @Bean
   JwtEncoder encoder(AuthProperties p) throws Exception {
-    var privateKey = RsaKeyConverters.pkcs8().convert(p.privateKey().getInputStream());
-    var publicKey = RsaKeyConverters.x509().convert(p.publicKey().getInputStream());
+    var privateKey = RsaKeyConverters.pkcs8().convert(keyStream(p.privateKey(), "private"));
+    var publicKey = RsaKeyConverters.x509().convert(keyStream(p.publicKey(), "public"));
     var key = new RSAKey.Builder(publicKey).privateKey(privateKey).keyID("contigo-signing").build();
     return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(key)));
   }
 
   @Bean
   JwtDecoder decoder(AuthProperties p) throws Exception {
-    var key = RsaKeyConverters.x509().convert(p.publicKey().getInputStream());
+    var key = RsaKeyConverters.x509().convert(keyStream(p.publicKey(), "public"));
     var decoder =
         NimbusJwtDecoder.withPublicKey(key).signatureAlgorithm(SignatureAlgorithm.RS256).build();
     OAuth2TokenValidator<Jwt> audience =
@@ -53,6 +57,26 @@ public class SecurityConfiguration {
             new JwtClaimValidator<java.time.Instant>("exp", Objects::nonNull),
             audience));
     return decoder;
+  }
+
+  /**
+   * Accepts either a Resource location (local/Docker) or the PEM text itself (App Service).
+   * Environment variables may contain literal \\n sequences; normalize them before parsing.
+   */
+  private static InputStream keyStream(String value, String kind) {
+    if (value == null || value.isBlank()) {
+      throw new IllegalStateException("Falta la clave JWT " + kind + ".");
+    }
+    String normalized = value.trim().replace("\\n", "\n");
+    if (normalized.startsWith("-----BEGIN")) {
+      return new ByteArrayInputStream(normalized.getBytes(StandardCharsets.UTF_8));
+    }
+    try {
+      return new DefaultResourceLoader().getResource(normalized).getInputStream();
+    } catch (Exception ex) {
+      throw new IllegalStateException(
+          "No se pudo leer la clave JWT " + kind + ". Use PEM o una ruta file:/ vÃ¡lida.", ex);
+    }
   }
 
   @Bean
@@ -168,7 +192,7 @@ public class SecurityConfiguration {
       res.sendRedirect(
           "/auth/recover?next="
               + java.net.URLEncoder.encode(destination, java.nio.charset.StandardCharsets.UTF_8));
-    } else problem(res, 401, "Su autenticación ha vencido. Inicie sesión nuevamente.");
+    } else problem(res, 401, "Su autenticaciÃ³n ha vencido. Inicie sesiÃ³n nuevamente.");
   }
 
   static void problem(HttpServletResponse res, int status, String detail)

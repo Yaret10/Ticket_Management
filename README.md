@@ -77,6 +77,10 @@ Las pruebas de SQL Server usan Testcontainers y requieren Docker disponible:
 
 La autenticación usa JWT en cookies HttpOnly, refresh tokens opacos, CSRF y contraseñas protegidas con BCrypt.
 
+En Azure App Service, `JWT_PRIVATE_KEY` y `JWT_PUBLIC_KEY` pueden contener directamente el texto PEM
+(con saltos de línea reales o escritos como `\\n`). La aplicación también conserva compatibilidad con
+rutas `file:` usadas por Docker y el entorno local. Después de cambiar estas variables, reinicia el App Service.
+
 La API está disponible bajo `/api/v1`. Swagger UI se encuentra en `/swagger-ui/index.html` después de iniciar sesión.
 
 ## Documentación adicional
