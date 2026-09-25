@@ -69,6 +69,19 @@ public class SecurityConfiguration {
     }
     String normalized = value.trim().replace("\\n", "\n");
     if (normalized.startsWith("-----BEGIN")) {
+      // App Service may wrap a multiline setting with spaces. Keep PEM markers and
+      // normalize only the encoded body before the standard Spring converter parses it.
+      int headerEnd = normalized.indexOf("-----", 5) + 5;
+      int footerStart = normalized.lastIndexOf("-----END");
+      if (headerEnd > 5 && footerStart > headerEnd) {
+        String body = normalized.substring(headerEnd, footerStart).replaceAll("\\s+", "");
+        normalized =
+            normalized.substring(0, headerEnd)
+                + "\n"
+                + body
+                + "\n"
+                + normalized.substring(footerStart);
+      }
       return new ByteArrayInputStream(normalized.getBytes(StandardCharsets.UTF_8));
     }
     try {
