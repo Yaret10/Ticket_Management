@@ -30,11 +30,7 @@ node --test scripts/frontend-tests.mjs
 
 The workflow `.github/workflows/main_contigo-backend.yml` builds and deploys an executable JAR to `contigo-backend`. It does not use container images or companion services.
 
-Configure the App Service as **Linux / Java SE / Java 25** with this startup command:
-
-```text
-java -jar /home/site/wwwroot/app.jar --server.port=8080
-```
+Configure the App Service as **Linux / Java SE / Java 25** and leave its startup command empty. App Service detects the OneDeploy JAR (`app.jar`) and supplies the runtime port through `SERVER_PORT`.
 
 In **Environment variables**, create the values from `.env.example`. The required settings are `SPRING_PROFILES_ACTIVE=prod`, `WEBSITES_PORT=8080`, `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `ATTACHMENTS_ROOT=/home/data/evidence`, and `APP_PUBLIC_URL` with the real HTTPS domain. The `prod` profile intentionally has no local defaults.
 
