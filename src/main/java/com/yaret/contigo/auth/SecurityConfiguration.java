@@ -60,8 +60,8 @@ public class SecurityConfiguration {
   }
 
   /**
-   * Accepts either a Resource location (local/Docker) or the PEM text itself (App Service).
-   * Environment variables may contain literal \\n sequences; normalize them before parsing.
+   * Accepts either a Resource location or the PEM text itself (App Service). Environment variables
+   * may contain literal \\n sequences; normalize them before parsing.
    */
   private static InputStream keyStream(String value, String kind) {
     if (value == null || value.isBlank()) {

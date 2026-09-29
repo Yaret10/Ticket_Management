@@ -1,99 +1,54 @@
 # conTIgo
 
-Aplicación web para registrar y gestionar tickets de soporte. Está construida con Java 25, Spring Boot, Thymeleaf, JavaScript, Spring Security, SQL Server y Docker.
+Web application for registering and managing support tickets. It uses Java 25, Spring Boot, Thymeleaf, JavaScript, Spring Security, and SQL Server.
 
-## Requisitos
+## Requirements
 
 - JDK 25.
-- Docker Desktop.
-- Git (opcional, para control de versiones).
+- An accessible SQL Server or Azure SQL instance.
 
-## Ejecutar con Docker
+## Run locally
 
-Desde la carpeta del proyecto:
-
-```powershell
-java scripts/GenerateLocalConfig.java
-docker compose up -d --build
-```
-
-Abrir `http://localhost:8080/login`.
-
-La base de datos es SQL Server y se llama `contigo`. Docker guarda los datos en los volúmenes `contigo_sql-data` y `contigo_evidence`.
-
-Para detener los contenedores sin borrar datos:
+For local SQL Server, your `.env` only needs `DB_PASSWORD`; the default host is
+`localhost:1433`, the default user is `sa`, and the local RSA files in `.local/` are used.
+Set `DB_URL` and `DB_USER` only if your SQL Server uses a different host, port, or user. Then run:
 
 ```powershell
-docker compose down
+.\mvnw.cmd spring-boot:run
 ```
 
-No uses `docker compose down -v` si quieres conservar la base de datos y las evidencias.
+Open `http://localhost:8080/login`. The SQL Server database must already exist and be named `contigo`; Flyway creates and upgrades its schema at startup.
 
-
-## Usuarios de desarrollo
-
-La contraseña común está en `DEV_PASSWORD` dentro de `.env`.
-
-| DNI | Rol | Función |
-|---|---|---|
-| `00000001` | EMPLEADO | Crea y consulta sus tickets |
-| `00000002` | JEFE | Gestiona su área principal |
-| `00000003` | TI | Atiende, rechaza y administra usuarios |
-| `00000004` | EMPLEADO | Usuario de otra área |
-| `00000005` | GERENTE | Gestiona las áreas asignadas |
-
-Los usuarios de prueba solo se crean en una base vacía cuando `DEV_SEED=true`.
-
-## Flujo de un ticket
-
-```text
-EMPLEADO crea el ticket
-        ↓
-JEFE o GERENTE aprueba
-        ↓
-TI atiende o rechaza
-        ↓
-EMPLEADO cierra el ticket atendido
-```
-
-Las evidencias admiten PDF, PNG, JPG/JPEG y TXT UTF-8, hasta 10 MB. En el detalle se pueden visualizar en el navegador o descargar.
-
-## Pruebas
+## Tests
 
 ```powershell
 .\mvnw.cmd test
 node --test scripts/frontend-tests.mjs
 ```
 
-Las pruebas de SQL Server usan Testcontainers y requieren Docker disponible:
+## Azure App Service deployment
 
-```powershell
-.\mvnw.cmd verify
+The workflow `.github/workflows/main_contigo-backend.yml` builds and deploys an executable JAR to `contigo-backend`. It does not use container images or companion services.
+
+Configure the App Service as **Linux / Java SE / Java 25** with this startup command:
+
+```text
+java -jar /home/site/wwwroot/app.jar --server.port=8080
 ```
 
-## Configuración y seguridad
+In **Environment variables**, create the values from `.env.example`. The required settings are `SPRING_PROFILES_ACTIVE=prod`, `WEBSITES_PORT=8080`, `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `ATTACHMENTS_ROOT=/home/data/evidence`, and `APP_PUBLIC_URL` with the real HTTPS domain. The `prod` profile intentionally has no local defaults.
 
-`.env.example` es solo una plantilla. El archivo `.env` contiene la configuración local y no debe subirse a Git. Las claves JWT se generan en `.local/`; esa carpeta también está excluida por `.gitignore`.
+JWT values can be full PEM text using line breaks or literal `\\n`. Do not add keys or passwords to Git.
 
-La autenticación usa JWT en cookies HttpOnly, refresh tokens opacos, CSRF y contraseñas protegidas con BCrypt.
+Azure SQL must allow the App Service outbound addresses, or be reached through private networking. The database identity must have enough permissions to execute Flyway migrations.
 
-En Azure App Service, `JWT_PRIVATE_KEY` y `JWT_PUBLIC_KEY` pueden contener directamente el texto PEM
-(con saltos de línea reales o escritos como `\\n`). La aplicación también conserva compatibilidad con
-rutas `file:` usadas por Docker y el entorno local. Después de cambiar estas variables, reinicia el App Service.
+To create the first administrator in an empty database, temporarily set `SPRING_PROFILES_ACTIVE=prod,bootstrap` and define `BOOTSTRAP_DNI`, `BOOTSTRAP_NAME`, `BOOTSTRAP_EMAIL`, and `BOOTSTRAP_PASSWORD`. The app creates the account and exits; restore the profile to `prod` and restart.
 
-### Despliegue en Azure App Service
+The API is under `/api/v1`. Open the application at `/login`; `/` requires authentication.
 
-El workflow `.github/workflows/deploy-azure.yml` compila el proyecto y publica el JAR en `contigo-backend`.
-En GitHub crea el secreto `AZURE_WEBAPP_PUBLISH_PROFILE` con el perfil de publicación descargado desde
-**Azure App Service → Descargar perfil de publicación**. El App Service debe usar Java SE y tener como
-comando de inicio `java -jar /home/site/wwwroot/app.jar --server.port=8080` (Azure OneDeploy renombra el JAR a `app.jar`).
-
-La API está disponible bajo `/api/v1`. Swagger UI se encuentra en `/swagger-ui/index.html` después de iniciar sesión.
-
-## Documentación adicional
+## Additional documentation
 
 - [API](docs/api.md)
-- [Arquitectura](docs/architecture.md)
-- [Permisos y seguridad](docs/security.md)
-- [Migración](docs/migration.md)
-- [Pruebas y limitaciones](docs/verification.md)
+- [Architecture](docs/architecture.md)
+- [Security](docs/security.md)
+- [Migration](docs/migration.md)
