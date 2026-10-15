@@ -1,5 +1,6 @@
 package com.yaret.contigo.auth;
 
+import com.yaret.contigo.shared.AppException;
 import jakarta.servlet.http.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -8,7 +9,6 @@ import java.util.Map;
 import org.springframework.http.*;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
-import com.yaret.contigo.shared.AppException;
 
 @io.swagger.v3.oas.annotations.security.SecurityRequirements
 @RestController
@@ -37,9 +37,9 @@ public class AuthController {
   public Map<String, String> login(
       @Valid @RequestBody Login d, HttpServletRequest req, HttpServletResponse res) {
 
-    //guard.attempt(TokenService.hash("dni:" + d.dni()));
-    //guard.attempt(TokenService.hash("ip:" + req.getRemoteAddr()));
-    //set(res, tokens.login(d.dni(), d.password()));
+    // guard.attempt(TokenService.hash("dni:" + d.dni()));
+    // guard.attempt(TokenService.hash("ip:" + req.getRemoteAddr()));
+    // set(res, tokens.login(d.dni(), d.password()));
 
     try {
       set(res, tokens.login(d.dni(), d.password()));
@@ -50,8 +50,7 @@ public class AuthController {
       throw e;
     }
 
-
-    //return Map.of("message", "Sesión iniciada.");
+    // return Map.of("message", "Sesión iniciada.");
   }
 
   @PostMapping("/refresh")
