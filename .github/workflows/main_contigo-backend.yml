@@ -24,6 +24,19 @@ jobs:
           java-version: '25'
           distribution: 'microsoft'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Angular
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
       - name: Build executable JAR
         run: |
           chmod +x mvnw
@@ -41,13 +54,13 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
-  
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -62,4 +75,4 @@ jobs:
           app-name: 'contigo-backend'
           slot-name: 'Production'
           package: 'contigo-1.0.0-SNAPSHOT.jar'
-          
+

@@ -8,9 +8,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class Errors {
+  @ExceptionHandler(NoResourceFoundException.class)
+  ProblemDetail resourceMissing(NoResourceFoundException e) {
+    return problem(404, "El recurso solicitado no existe.");
+  }
+
   @ExceptionHandler(org.springframework.core.task.TaskRejectedException.class)
   ProblemDetail busy(Exception e) {
     return problem(

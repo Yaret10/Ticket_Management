@@ -6,6 +6,10 @@ HELP.md
 *.pem
 __pycache__/
 target/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.angular/
+/frontend/out-tsc/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

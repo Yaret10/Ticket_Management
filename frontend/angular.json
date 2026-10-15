@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "contigo": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": { "base": "dist", "browser": "" },
+            "outputMode": "static",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [],
+            "optimization": { "scripts": true, "fonts": false, "styles": { "minify": true, "inlineCritical": false } },
+            "outputHashing": "all",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [{ "glob": "**/*", "input": "public", "output": "/" }],
+            "styles": ["src/legacy.css", "src/styles.css"]
+          }
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": { "buildTarget": "contigo:build" }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "97d2fbfb-becb-4470-b514-e4dfe158fee5"
+  }
+}

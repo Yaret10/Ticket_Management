@@ -1,68 +1,52 @@
 package com.yaret.contigo.shared;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class PageController {
   @GetMapping("/login")
   String login() {
-    return "login";
+    return "forward:/index.html";
   }
 
   @GetMapping("/auth/recover")
   String recovery() {
-    return "recover";
+    return "forward:/index.html";
   }
 
   @GetMapping({"/", "/menu"})
-  String menu(Model m) {
-    m.addAttribute("title", "Inicio");
-    m.addAttribute("page", "menu");
-    return "menu";
+  String menu() {
+    return "forward:/index.html";
   }
 
   @GetMapping("/tickets/new")
-  String create(Model m) {
-    m.addAttribute("title", "Registrar ticket");
-    m.addAttribute("page", "new");
-    return "new";
+  String create() {
+    return "forward:/index.html";
   }
 
   @GetMapping("/tickets")
-  String list(Model m) {
-    m.addAttribute("title", "Consultar tickets");
-    m.addAttribute("page", "list");
-    return "list";
+  String list() {
+    return "forward:/index.html";
   }
 
   @GetMapping("/tickets/{id}")
-  String detail(@PathVariable Long id, Model m) {
-    m.addAttribute("title", "Detalle del ticket");
-    m.addAttribute("page", "detail");
-    m.addAttribute("ticketId", id);
-    return "detail";
+  String detail(@PathVariable Long id) {
+    return "forward:/index.html";
   }
 
   @GetMapping("/dashboard")
-  String dashboard(Model m) {
-    m.addAttribute("title", "Dashboard");
-    m.addAttribute("page", "dashboard");
-    return "dashboard";
+  String dashboard() {
+    return "forward:/index.html";
   }
 
   @GetMapping("/reports")
-  String reports(Model m) {
-    m.addAttribute("title", "Reportes");
-    m.addAttribute("page", "reports");
-    return "list";
+  String reports() {
+    return "forward:/index.html";
   }
 
   @GetMapping("/users/new")
-  String users(Model m) {
-    m.addAttribute("title", "Registrar usuario");
-    m.addAttribute("page", "users");
-    return "users";
+  String users() {
+    return "forward:/index.html";
   }
 }

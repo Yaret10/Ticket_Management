@@ -1,19 +1,24 @@
 # conTIgo
 
-Web application for registering and managing support tickets. It uses Java 25, Spring Boot, Thymeleaf, JavaScript, Spring Security, and SQL Server.
+Web application for registering and managing support tickets. It uses Java 25, Spring Boot, Angular, Spring Security, and SQL Server. Angular and the API are served from the same Spring Boot JAR and Azure App Service.
 
 ## Requirements
 
 - JDK 25.
+- Node.js 24 and npm.
 - An accessible SQL Server or Azure SQL instance.
 
 ## Run locally
 
 For local SQL Server, your `.env` only needs `DB_PASSWORD`; the default host is
 `localhost:1433`, the default user is `sa`, and the local RSA files in `.local/` are used.
-Set `DB_URL` and `DB_USER` only if your SQL Server uses a different host, port, or user. Then run:
+Set `DB_URL` and `DB_USER` only if your SQL Server uses a different host, port, or user. Build Angular and run Spring Boot:
 
 ```powershell
+cd frontend
+npm ci
+npm run build
+cd ..
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -22,9 +27,14 @@ Open `http://localhost:8080/login`. The SQL Server database must already exist a
 ## Tests
 
 ```powershell
+cd frontend
+npm ci
+npm run build
+cd ..
 .\mvnw.cmd test
-node --test scripts/frontend-tests.mjs
 ```
+
+For frontend development, run Spring Boot on port 8080 and `npm start` in `frontend/` on port 4200. The Angular dev server proxies `/api` to Spring Boot. For production, Maven copies `frontend/dist` into the JAR's static resources; build Angular before packaging. Direct links to Angular routes are forwarded to the bundled `index.html`.
 
 ## Azure App Service deployment
 

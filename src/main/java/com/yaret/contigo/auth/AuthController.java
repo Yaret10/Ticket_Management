@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.*;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
+import com.yaret.contigo.shared.AppException;
 
 @io.swagger.v3.oas.annotations.security.SecurityRequirements
 @RestController
@@ -35,10 +36,22 @@ public class AuthController {
   @PostMapping("/login")
   public Map<String, String> login(
       @Valid @RequestBody Login d, HttpServletRequest req, HttpServletResponse res) {
-    guard.attempt(TokenService.hash("dni:" + d.dni()));
-    guard.attempt(TokenService.hash("ip:" + req.getRemoteAddr()));
-    set(res, tokens.login(d.dni(), d.password()));
-    return Map.of("message", "Sesión iniciada.");
+
+    //guard.attempt(TokenService.hash("dni:" + d.dni()));
+    //guard.attempt(TokenService.hash("ip:" + req.getRemoteAddr()));
+    //set(res, tokens.login(d.dni(), d.password()));
+
+    try {
+      set(res, tokens.login(d.dni(), d.password()));
+      return Map.of("message", "Sesión iniciada.");
+    } catch (AppException e) {
+      guard.attempt(TokenService.hash("dni:" + d.dni()));
+      guard.attempt(TokenService.hash("ip:" + req.getRemoteAddr()));
+      throw e;
+    }
+
+
+    //return Map.of("message", "Sesión iniciada.");
   }
 
   @PostMapping("/refresh")

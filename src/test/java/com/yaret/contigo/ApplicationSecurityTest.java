@@ -558,9 +558,22 @@ class ApplicationSecurityTest {
           .andExpect(status().isOk());
     }
     mvc.perform(get("/login")).andExpect(status().isOk());
+    mvc.perform(get("/index.html")).andExpect(status().isOk());
     mvc.perform(get("/tickets").cookie(access(login("00000001"))))
         .andExpect(status().isOk())
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("Consultar tickets")));
+        .andExpect(forwardedUrl("/index.html"));
+    String angularIndex =
+        mvc.perform(get("/index.html"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("<app-root>")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    var script =
+        java.util.regex.Pattern.compile("src=\"(main-[^\"]+\\.js)\"").matcher(angularIndex);
+    assertTrue(script.find(), "Angular bundle missing from index.html");
+    mvc.perform(get("/" + script.group(1))).andExpect(status().isOk());
+    mvc.perform(get("/missing-asset.js")).andExpect(status().isNotFound());
   }
 
   @Test

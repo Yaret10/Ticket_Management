@@ -1,0 +1,5 @@
+/* App-specific additions to the existing conTIgo theme. */
+.inline-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inline-actions button{padding:6px 10px}
+.form-error{color:#841f1f}
+.loading{color:var(--muted)}

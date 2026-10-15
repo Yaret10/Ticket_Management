@@ -100,6 +100,7 @@ public class SecurityConfiguration {
       if (Set.of(
                   "/login",
                   "/auth/recover",
+                  "/index.html",
                   "/api/v1/auth/login",
                   "/api/v1/auth/refresh",
                   "/api/v1/auth/logout",
@@ -107,7 +108,8 @@ public class SecurityConfiguration {
               .contains(path)
           || path.startsWith("/css/")
           || path.startsWith("/js/")
-          || path.startsWith("/images/")) return null;
+          || path.startsWith("/images/")
+          || path.matches("/[^/]+\\.(js|css|ico)")) return null;
       if (request.getCookies() != null)
         for (var c : request.getCookies()) if ("ACCESS".equals(c.getName())) return c.getValue();
       return null;
@@ -144,9 +146,13 @@ public class SecurityConfiguration {
                     .requestMatchers(
                         "/login",
                         "/auth/recover",
+                        "/index.html",
                         "/css/**",
                         "/js/**",
                         "/images/**",
+                        "/*.js",
+                        "/*.css",
+                        "/*.ico",
                         "/api/v1/auth/login",
                         "/api/v1/auth/refresh",
                         "/api/v1/auth/logout",

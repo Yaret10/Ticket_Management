@@ -1,10 +1,10 @@
 # Arquitectura y modelo de datos
 
-Una aplicación MVC y una base SQL Server. Los módulos se organizan por funcionalidad; controladores API pequeños delegan en servicios transaccionales. Los records representan DTOs, no entidades serializadas. TicketPolicy concentra visibilidad y transiciones. No se incorporaron Redis, Kafka ni infraestructura distribuida adicional: SQL Server coordina códigos, renovación y outbox.
+Una aplicación Angular con API Spring Boot y una base SQL Server, empaquetada en un solo JAR. Angular construye las pantallas en el navegador; Spring Boot sirve los archivos compilados y los endpoints `/api/v1`. Los módulos Java se organizan por funcionalidad; controladores API pequeños delegan en servicios transaccionales. Los records representan DTOs, no entidades serializadas. TicketPolicy concentra visibilidad y transiciones. SQL Server coordina códigos, renovación y outbox.
 
 ```mermaid
 flowchart LR
-  Browser[Thymeleaf + CSS + módulos JS] --> Security[Security Resource Server / Cookie JWT + CSRF]
+  Browser[Angular + CSS] --> Security[Security Resource Server / Cookie JWT + CSRF]
   Security --> API[API /api/v1]
   API --> Auth[auth]
   API --> Users[users + areas]
